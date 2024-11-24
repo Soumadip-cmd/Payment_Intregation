@@ -57,6 +57,7 @@ const PaymentScreen = ({amount}) => {
           try {
             const verifyResponse = await fetch(`${backend_url}/api/verify`, {
               method: 'POST',
+              mode: 'no-cors',
               headers: {
                 'Content-Type': 'application/json',
               },
