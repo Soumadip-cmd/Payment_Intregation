@@ -20,6 +20,8 @@ const PaymentScreen = ({amount}) => {
   };
 
   const handlePayment = async () => {
+
+    let backend_url="https://payment-intregation.onrender.com"
     const { name, email, contact, address } = formData;
 
     if (!name || !email || !contact || !address) {
@@ -29,7 +31,7 @@ const PaymentScreen = ({amount}) => {
 
     try {
       // First create order on backend
-      const response = await fetch('http://localhost:4000/api/checkout', {
+      const response = await fetch(`${backend_url}/api/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -53,7 +55,7 @@ const PaymentScreen = ({amount}) => {
         order_id: data.order.id,
         handler: async function (response) {
           try {
-            const verifyResponse = await fetch('http://localhost:4000/api/verify', {
+            const verifyResponse = await fetch(`${backend_url}/api/verify`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
