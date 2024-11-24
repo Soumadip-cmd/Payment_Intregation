@@ -33,7 +33,6 @@ const PaymentScreen = ({amount}) => {
       // First create order on backend
       const response = await fetch(`${backend_url}/api/checkout`, {
         method: 'POST',
-        mode: 'no-cors',
         headers: {
           'Content-Type': 'application/json',
         },
