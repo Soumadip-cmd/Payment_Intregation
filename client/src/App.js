@@ -4,7 +4,7 @@ import PaymentScreen from "./components/PaymentScreen";
 import PaymentSuccess from "./components/PaymentSuccess";
 
 function App() {
-  const amount=17
+  const amount=10
   return (
     <>
       <Router>

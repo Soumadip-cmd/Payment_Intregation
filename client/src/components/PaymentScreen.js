@@ -1,14 +1,15 @@
+// PaymentScreen.js
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const PaymentScreen = ({amount}) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     contact: "",
     address: "",
   });
-
-  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,7 +19,7 @@ const PaymentScreen = ({amount}) => {
     }));
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     const { name, email, contact, address } = formData;
 
     if (!name || !email || !contact || !address) {
@@ -26,35 +27,84 @@ const PaymentScreen = ({amount}) => {
       return;
     }
 
-    console.log(`Clicked Amount: ₹${amount}`);
-    const options = {
-      key: process.env.REACT_APP_RAZORPAY_KEY_ID,
-      amount: amount * 100,
-      currency: "INR",
-      name: "BaXar",
-      description: "Payment For Shopping",
-      image: "check.png",
-      callback_url: "http://localhost:4000/api/verify",
-      prefill: {
-        name,
-        email,
-        contact,
-      },
-      notes: {
-        address,
-      },
-      theme: {
-        color: "#A02727",
-      },
-    };
+    try {
+      // First create order on backend
+      const response = await fetch('http://localhost:4000/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ number: amount })
+      });
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to create order');
+      }
 
-    const razor = new window.Razorpay(options);
-    razor.open();
-    razor.on("payment.failed", (response) => {
-      console.error("Payment Failed: ", response.error);
-    });
+      const options = {
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+        amount: amount * 100,
+        currency: "INR",
+        name: "₷oµmăɗİþ",
+        description: "Payment For Work",
+        image: "check.png",
+        order_id: data.order.id,
+        handler: async function (response) {
+          try {
+            const verifyResponse = await fetch('http://localhost:4000/api/verify', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              })
+            });
+            
+            const verifyData = await verifyResponse.json();
+            
+            if (verifyData.success) {
+              navigate(`/payment-success?reference=${response.razorpay_payment_id}`);
+            } else {
+              alert('Payment verification failed. Please contact support.');
+            }
+          } catch (error) {
+            console.error('Verification Error:', error);
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name,
+          email,
+          contact,
+        },
+        notes: {
+          address,
+        },
+        theme: {
+          color: "#A02727",
+        },
+      };
+
+      const razor = new window.Razorpay(options);
+      razor.open();
+      
+      razor.on("payment.failed", (response) => {
+        console.error("Payment Failed: ", response.error);
+        alert(`Payment failed: ${response.error.description}`);
+      });
+    } catch (error) {
+      console.error('Payment Error:', error);
+      alert('Failed to initiate payment. Please try again.');
+    }
   };
 
+  
+  
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center">
       <div className="mx-auto w-full max-w-md p-8 bg-white rounded-lg shadow-lg">

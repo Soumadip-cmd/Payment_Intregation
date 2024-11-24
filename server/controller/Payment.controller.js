@@ -7,7 +7,10 @@ const PaymentCheck = async (req, res) => {
   try {
     const { number } = req.body;
     
+    console.log("Received payment request for amount:", number);
+    
     if (!number) {
+      console.log("Amount is missing in request");
       return res.status(400).json({ 
         success: false,
         error: "Amount is required" 
@@ -25,7 +28,10 @@ const PaymentCheck = async (req, res) => {
       receipt: "receipt_" + Date.now(),
     };
 
+    console.log("Creating Razorpay order with options:", options);
+
     const order = await instance.orders.create(options);
+    console.log("Razorpay order created:", order);
 
     res.status(200).json({
       success: true,
@@ -35,46 +41,49 @@ const PaymentCheck = async (req, res) => {
     console.error("Order Creation Error:", error);
     res.status(500).json({
       success: false,
-      error: "Failed to create order: " + error.message
+      error: "Failed to create order",
+      details: error.message,
+      code: error.code
     });
   }
 };
 
+
 // Payment verify
 const PaymentVerify = async (req, res) => {
   try {
-    const {
-      razorpay_order_id,
-      razorpay_payment_id,
-      razorpay_signature
-    } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return res.status(400).json({
         success: false,
-        error: "Missing payment verification parameters"
+        error: "Missing required payment verification parameters"
       });
     }
 
-    const sign = razorpay_order_id + "|" + razorpay_payment_id;
-    const generated_signature = crypto
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+
+    const expectedSignature = crypto
       .createHmac("sha256", process.env.KEY_SECRET)
-      .update(sign.toString())
+      .update(body.toString())
       .digest("hex");
 
-    if (generated_signature === razorpay_signature) {
-      const payment = new Payment({
+    const isAuthentic = expectedSignature === razorpay_signature;
+
+    if (isAuthentic) {
+      // Database comes here
+      await Payment.create({
         razorpay_order_id,
         razorpay_payment_id,
         razorpay_signature,
       });
 
-      await payment.save();
-
-      // Redirect to the desired page after successful payment
-      return res.redirect('http://localhost:3000/payment-success'); // Change '/payment-success' to your desired page
+      res.status(200).json({
+        success: true,
+        message: "Payment verified successfully"
+      });
     } else {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: "Payment verification failed"
       });
@@ -83,7 +92,7 @@ const PaymentVerify = async (req, res) => {
     console.error("Verification Error:", error);
     res.status(500).json({
       success: false,
-      error: "Internal server error: " + error.message
+      error: "Internal server error during verification"
     });
   }
 };

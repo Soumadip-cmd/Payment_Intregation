@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { CheckCircle, ArrowLeft } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 
-const PaymentSuccess = () => {
+const PaymentSuccess = ({ amount }) => {
   const [showCheck, setShowCheck] = useState(false);
   const [showContent, setShowContent] = useState(false);
+
+  const searchQuery = useSearchParams()[0];
+
+  const referenceNum = searchQuery.get("reference");
+
+  // Get current date and format it to "Month Day, Year"
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
   useEffect(() => {
     setTimeout(() => setShowCheck(true), 500);
@@ -32,15 +45,15 @@ const PaymentSuccess = () => {
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Amount Paid</span>
-              <span className="font-semibold text-gray-800">₹2,499</span>
+              <span className="font-semibold text-gray-800">{amount}</span>
             </div>
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Transaction ID</span>
-              <span className="font-semibold text-gray-800">TXN123456789</span>
+              <span className="font-semibold text-gray-800 uppercase">{referenceNum}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Date</span>
-              <span className="font-semibold text-gray-800">November 24, 2024</span>
+              <span className="font-semibold text-gray-800">{formattedDate}</span>
             </div>
           </div>
           <div className="space-y-3">

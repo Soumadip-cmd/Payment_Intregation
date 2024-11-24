@@ -2,10 +2,15 @@ require("dotenv").config();
 const express = require("express");
 const connectedDb = require("./config/db");
 const payRouter = require("./routes/PaymentRoute");
+const cors = require("cors");
 const Razorpay = require("razorpay");
 const app = express();
 
 const port = process.env.PORT;
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
 
 connectedDb();
 
