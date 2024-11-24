@@ -1,16 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { CheckCircle, ArrowLeft } from "lucide-react";
-import { useParams, useLocation } from "react-router-dom";
 
-const PaymentSuccess = ({amount}) => {
+const PaymentSuccess = () => {
   const [showCheck, setShowCheck] = useState(false);
   const [showContent, setShowContent] = useState(false);
-  const { paymentId } = useParams();
-  const location = useLocation();
-
-  // Get payment details from location state
-  const currentDate = location.state?.date || new Date().toLocaleDateString();
-  const paidAmount = location.state?.amount || amount;
 
   useEffect(() => {
     setTimeout(() => setShowCheck(true), 500);
@@ -39,15 +32,15 @@ const PaymentSuccess = ({amount}) => {
           <div className="bg-gray-50 rounded-lg p-4 mb-6">
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Amount Paid</span>
-              <span className="font-semibold text-gray-800">₹{paidAmount}</span>
+              <span className="font-semibold text-gray-800">₹2,499</span>
             </div>
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Transaction ID</span>
-              <span className="font-semibold text-gray-800 uppercase">{paymentId}</span>
+              <span className="font-semibold text-gray-800">TXN123456789</span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Date</span>
-              <span className="font-semibold text-gray-800">{currentDate}</span>
+              <span className="font-semibold text-gray-800">November 24, 2024</span>
             </div>
           </div>
           <div className="space-y-3">
@@ -56,7 +49,7 @@ const PaymentSuccess = ({amount}) => {
             </button>
             <button
               className="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors duration-200 flex items-center justify-center"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => window.location.href = "/"}
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard

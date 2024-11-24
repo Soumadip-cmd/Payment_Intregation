@@ -4,14 +4,14 @@ import PaymentScreen from "./components/PaymentScreen";
 import PaymentSuccess from "./components/PaymentSuccess";
 
 function App() {
-  const amount=10
+  const amount=17
   return (
     <>
       <Router>
         <Routes>
           <Route path="/" element={<PaymentScreen amount={amount}/>} />
           <Route
-            path="/payment-success/:paymentId"
+            path="/payment-success"
             element={<PaymentSuccess amount={amount}/>}
           />
         </Routes>

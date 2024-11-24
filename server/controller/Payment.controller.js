@@ -71,11 +71,8 @@ const PaymentVerify = async (req, res) => {
 
       await payment.save();
 
-      return res.status(200).json({
-        success: true,
-        message: "Payment verified successfully",
-        paymentId: razorpay_payment_id
-      });
+      // Redirect to the desired page after successful payment
+      return res.redirect('http://localhost:3000/payment-success'); // Change '/payment-success' to your desired page
     } else {
       return res.status(400).json({
         success: false,
@@ -90,5 +87,9 @@ const PaymentVerify = async (req, res) => {
     });
   }
 };
+
+
+
+
 
 module.exports = { PaymentCheck, PaymentVerify };
