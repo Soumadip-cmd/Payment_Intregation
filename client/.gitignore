@@ -6,6 +6,7 @@
 .pnp.js
 rzp.csv
 
+.env
 # testing
 /coverage
 
