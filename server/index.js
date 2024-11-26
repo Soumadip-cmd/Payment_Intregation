@@ -7,10 +7,7 @@ const Razorpay = require("razorpay");
 const app = express();
 
 const port = process.env.PORT;
-app.use(cors({
-  origin: "https://payment-soumadip.vercel.app",
-  credentials: true
-}));
+app.use(cors());
 
 connectedDb();
 

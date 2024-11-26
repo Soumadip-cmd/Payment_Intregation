@@ -22,6 +22,7 @@ const PaymentScreen = ({amount}) => {
   const handlePayment = async () => {
 
     let backend_url="https://payment-intregation.onrender.com"
+    // let backend_url="http://localhost:4000"
     const { name, email, contact, address } = formData;
 
     if (!name || !email || !contact || !address) {
